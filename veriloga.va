@@ -332,7 +332,7 @@ endmodule
 /*
 Table of parameter corners and corresponding model constants:
 
-Aex(*1e12), Xi,	B_anis(mT), A,	Msat,	W(nm),	c0,		c1,		c2,		c3,		drift_const, k6
+Aex(*1e-12), Xi,	B_anis(mT), A,	Msat,	W(nm),	c0,		c1,		c2,		c3,		drift_const, k6
 11	0.01	350	0.01	1200000	100	-0.327816	2.09465E-09	-4.07374E-20	3.37818E-31	15.833	1.18031E-12
 11	0.01	350	0.01	1200000	50	-0.192543	2.0949E-09	-2.40119E-20	1.07929E-32	11.1333	1.47832E-12
 11	0.01	350	0.05	1200000	100	-0.0833278	4.09925E-10	-9.58319E-22	-1.02026E-32	4.37769	0
