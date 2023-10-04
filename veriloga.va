@@ -1,7 +1,6 @@
-
+    
 `include "constants.vams"
 `include "disciplines.vams"
-
 
 nature distance 
   access = Metr;
@@ -13,15 +12,15 @@ discipline Distance
   potential distance;
 enddiscipline
 
-module DW_kinematic_model(P, Q, DW_Position, RA, DW_Velocity, DW_MC, DW_Req,DW_J,A_J,A_k5,A_k6);
-
+module DW_kinematic_model(P, Q, DW_Position, RA, DW_Velocity, DW_MC, DW_Req,DW_J,A_J,
+    A_k5,A_k6);
 
 inout P, Q;					//P is defined as the left port of the DW track, and Q is the right port.
 inout RA;					//MTJ output port
-output DW_Position;				//This port measures the DW position, in unit of meter
-output DW_Velocity;				//This port measures the DW velocity, in unit of meter
-output DW_MC;					//This port measures the effective DW track current, converted into unit of meter. e.g. 1 uA => 1 uM.
-output DW_J;					//This port measures the effective DW track current density, converted into unit of meter. e.g. 1 uA => 1 uM.
+output DW_Position;				//This port measures the DW position, in meters
+output DW_Velocity;				//This port measures the DW velocity, in meters
+output DW_MC;					//This port measures the effective DW track current, in Amps.
+output DW_J;					//This port measures the effective DW track current density, in Amps.
 
 // Ports measuring various acceleration contributions, for tracking
 output A_J;
@@ -74,9 +73,8 @@ parameter real Areaa = 1.2e-9*50e-9;		// cross section area of heavy metal layer
 parameter real thetaSH = 0.05;
 real B_anis = 0;				// B_anis calculated from other params
 
-
-parameter real c_r = 0.25;			// coefficient of restitution, controls track end bounce, between 0 and 1
-
+parameter real c_r = 0.25;			// coefficient of restitution, controls track end bounce, 
+    between 0 and 1
 
 // Domain Wall motion variables
 real Pdw;				//measured in m, not nm
@@ -96,11 +94,11 @@ real IPQPQ;
 real prev_time;
 
 // model constants
-real c0;
-real c1;
-real c2;
-real c3;
-real drift_const;
+real c0; //Change to "parameter real" to set manually.
+real c1; //Change to "parameter real" to set manually.
+real c2; //Change to "parameter real" to set manually.
+real c3; //Change to "parameter real" to set manually.
+real drift_const; //Change to "parameter real" to set manually.
 
 real k0;
 real k1;
@@ -108,14 +106,11 @@ real k2;
 real k3;
 real k4;
 real k5;
-real k6;
-
-
+real k6; //Change to "parameter real" to set manually.
 
 Distance A_J;
 Distance A_k5;
 Distance A_k6;
-
 
 //------------------------------------MTJ resistance voltage dependence section
 
@@ -123,9 +118,7 @@ real Rp_eq;
 real Rap_eq;
 real VMTJ_eq; 
 
-
 //------------------------------------MTJ resistance voltage dependence section end
-
 
 analog
 begin
@@ -143,7 +136,7 @@ begin
 		J_init = 0;
 		
 		
-		//Req = (( (Pdw_limit - Pdw) / (Pdw_limit) ) * Rap ) + (( (Pdw) / (Pdw_limit) ) * Rp ) ; 		
+		//Req = (((Pdw_limit - Pdw) / Pdw_limit ) * Rap) + ((Pdw / Pdw_limit) * Rp) ; 		
 		Req = R_init;
 
 		if(Ku == 1.11e6 || Ku == 5.36e5)
@@ -163,15 +156,21 @@ begin
     			B_anis = (Ku/(0.5*Msat) - (4*`M_PI*1e-7)*Msat)*1000;
 		end
 
-
-
-		//read in constant values for specific parameter corner from lookup table files (table at end of file)
-		c0 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "/home/eng/l/lmh180005/lookup_maxVel_c0.tbl", "1L,1L,1L,1L,1L,1L");
-		c1 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "/home/eng/l/lmh180005/lookup_maxVel_c1.tbl", "1L,1L,1L,1L,1L,1L");
-		c2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "/home/eng/l/lmh180005/lookup_maxVel_c2.tbl", "1L,1L,1L,1L,1L,1L");
-		c3 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "/home/eng/l/lmh180005/lookup_maxVel_c3.tbl", "1L,1L,1L,1L,1L,1L");
-		drift_const = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "/home/eng/l/lmh180005/lookup_drift_const.tbl", "1L,1L,1L,1L,1L,1L");
-		k6 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "/home/eng/l/lmh180005/lookup_k6.tbl", "1L,1L,1L,1L,1L,1L");
+//Comment out the following block if constants c0-c3, drift_const, and k6 manually set.
+		//read in constant values for specific parameter corner from lookup table files 
+    (included on github).
+		c0 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
+    "lookup_maxVel_c0.tbl", "1L,1L,1L,1L,1L,1L");
+		c1 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
+    "lookup_maxVel_c1.tbl", "1L,1L,1L,1L,1L,1L");
+		c2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
+    "lookup_maxVel_c2.tbl", "1L,1L,1L,1L,1L,1L");
+		c3 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
+    "lookup_maxVel_c3.tbl", "1L,1L,1L,1L,1L,1L");
+		drift_const = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
+    "lookup_drift_const.tbl", "1L,1L,1L,1L,1L,1L");
+		k6 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
+    "lookup_k6.tbl", "1L,1L,1L,1L,1L,1L");
 		
 		// calculate other constants
 		k5 =  1/drift_const; 
@@ -183,8 +182,8 @@ begin
 
 	end
 
-
-	//if pos of DW below (left of) MTJ, current through wall determined by left pin (P) and MTJ voltage
+	//if pos of DW below (left of) MTJ, current through wall determined by left pin (P) and 
+    MTJ voltage
 	if(Pdw < ((Pdw_low + Pdw_high)/2))
 	begin
 		IPQPQ = I(P, Vmiddle);
@@ -220,12 +219,11 @@ begin
 	end
 
 	// Calculation of acceleration, velocity, position
-	Adw = - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss)) - (k5 + k6*abs(Jdenss))*Vdw;	// [nm/ns^2]
+	Adw = - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + 
+    k1*abs(Jdenss)) - (k5 + k6*abs(Jdenss))*Vdw;	// [nm/ns^2]
 	Vdw = Vdw + Adw * dt;															// [nm/ns = m/s]
 	Pdw = Pdw + Vdw * dt*1e-9;														// [m]
 	
-	
-
 //---------------------------------------Edge bounce
 
 	if(Pdw<=0)
@@ -238,8 +236,6 @@ begin
 		Pdw = Pdw_limit;
 		Vdw = -c_r*Vdw;
 	end
-
-
 
 //------------------------------------MTJ resistance voltage dependence section
 
@@ -257,12 +253,7 @@ begin
 
 	end
 
-
-
-
 //------------------------------------MTJ resistance voltage dependence section end
-
-
 
 	if(Pdw <= Pdw_low && Pdw >=0)
 	begin
@@ -275,32 +266,12 @@ begin
 	else
 	begin 
 
-		Req = ((Pdw_high - Pdw_low) * Rp_eq * Rap_eq) / ((Rp_eq * (Pdw - Pdw_low)) + ( Rap_eq * (Pdw_high - Pdw)));
+		Req = ((Pdw_high - Pdw_low) * Rp_eq * Rap_eq) / ((Rp_eq * (Pdw - Pdw_low)) + ( Rap_eq
+    * (Pdw_high - Pdw)));
 	end
-
-
-
-/*		//	Convert to Buffer
-	if(Pdw <= Pdw_low && Pdw >=0)
-	begin
-		Req = Rap_eq;
-	end
-	else if(Pdw >= Pdw_high && Pdw <= Pdw_limit)
-	begin
-		Req = Rp_eq;
-	end
-	else
-	begin
-		Req = ((Pdw_high - Pdw_low) * Rp_eq * Rap_eq) / ((Rap_eq * (Pdw - Pdw_low)) + ( Rp_eq * (Pdw_high - Pdw)));
-	end
-*/
-
-
 
 	RR = (Pdw_limit-Pdw_low-10n)/(Pdw_limit)*Rtotal;
 	RL = Rtotal - RR;
-
-
 
 	// calculate currents through device
 	I(P, Vmiddle) <+ V(P, Vmiddle) / RL;
@@ -308,10 +279,9 @@ begin
 
 	I(Vmiddle, RA) <+ V(Vmiddle, RA) / Req;
 
-
-
 	// Components of acceleration split up, measurable on ports
-	Metr(A_J) <+ - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss));
+	Metr(A_J) <+ - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + 
+    k2*(abs(Jdenss)**2) + k1*abs(Jdenss));
 	Metr(A_k5) <+ -k5*Vdw;
 	Metr(A_k6) <+ - k6*abs(Jdenss)*Vdw;
 
@@ -322,79 +292,5 @@ begin
 	Metr(DW_MC) <+ IPQPQ;
 	Metr(DW_J) <+ Jdenss/1e9;
 
-	
-
-
 end
 endmodule
-
-
-/*
-Table of parameter corners and corresponding model constants:
-
-Aex(*1e-12), Xi,	B_anis(mT), A,	Msat,	W(nm),	c0,		c1,		c2,		c3,		drift_const, k6
-11	0.01	350	0.01	1200000	100	-0.327816	2.09465E-09	-4.07374E-20	3.37818E-31	15.833	1.18031E-12
-11	0.01	350	0.01	1200000	50	-0.192543	2.0949E-09	-2.40119E-20	1.07929E-32	11.1333	1.47832E-12
-11	0.01	350	0.05	1200000	100	-0.0833278	4.09925E-10	-9.58319E-22	-1.02026E-32	4.37769	0
-11	0.01	350	0.05	1200000	50	-0.0159904	3.95512E-10	4.95345E-22	-2.27335E-32	2.29269	0
-11	0.01	20	0.01	795000	100	-1.40044	1.28834E-08	-4.95528E-19	6.15237E-30	18.4994	5.07485E-12
-11	0.01	20	0.01	795000	50	-0.971463	1.14437E-08	-3.4E-19	3.17481E-30	11.7179	4.98379E-12
-11	0.01	20	0.05	795000	100	-0.555523	2.53405E-09	-1.31949E-20	-1.07108E-31	3.36506	5.3368E-13
-11	0.01	20	0.05	795000	50	0.391407	1.82735E-09	2.01763E-20	-5.7328E-31	2.06793	0
-11	0.01	350	0.01	795000	100	-0.349561	4.19803E-09	-8.01089E-20	5.23564E-31	10.9109	2.81021E-12
-11	0.01	350	0.01	795000	50	-0.202931	4.08757E-09	-5.46606E-20	5.599E-32	8.80952	3.12571E-12
-11	0.01	350	0.05	795000	100	-0.084875	8.05477E-10	-7.97314E-22	-3.02146E-32	2.23956	6.21502E-14
-11	0.01	350	0.05	795000	50	-0.0452939	7.90744E-10	-4.27275E-22	-2.04638E-32	1.68633	0
-11	0.01	20	0.01	1200000	100	-1.03185	5.53454E-09	-1.528E-19	1.45547E-30	17.3121	2.76637E-12
-11	0.01	20	0.01	1200000	50	-0.499874	4.71666E-09	-7.04164E-20	8.12521E-32	10.8541	2.97993E-12
-11	0.01	20	0.05	1200000	100	-0.257899	1.0622E-09	-2.2129E-21	-5.09497E-32	3.35312	0
-11	0.01	20	0.05	1200000	50	-0.112976	9.09635E-10	-7.90319E-22	-2.02029E-32	1.94647	0
-11	0.05	350	0.01	1200000	100	-0.325737	2.09326E-09	-4.06124E-20	3.35418E-31	15.8331	1.17917E-12
-11	0.05	350	0.01	1200000	50	-0.177771	2.06368E-09	-2.23121E-20	-1.01067E-32	11.1295	1.56464E-12
-11	0.05	350	0.05	1200000	100	-0.0829628	4.09845E-10	-9.62696E-22	-1.00254E-32	4.37802	0
-11	0.05	350	0.05	1200000	50	-0.0315738	4.02452E-10	-9.57333E-23	-1.10957E-32	2.38663	0
-11	0.05	20	0.01	795000	100	-1.41323	1.28887E-08	-4.95862E-19	6.1578E-30	18.5026	5.07242E-12
-11	0.05	20	0.01	795000	50	-0.829388	1.11686E-08	-3.26881E-19	3.06865E-30	12.3651	5.63483E-12
-11	0.05	20	0.05	795000	100	-0.52807	2.53199E-09	-1.3192E-20	-1.06238E-31	3.36463	5.22352E-13
-11	0.05	20	0.05	795000	50	-0.183981	2.09662E-09	-3.09524E-21	-1.13552E-31	2.11406	0
-11	0.05	350	0.01	795000	100	-0.350771	4.19901E-09	-8.01842E-20	5.24917E-31	10.9114	2.81251E-12
-11	0.05	350	0.01	795000	50	-0.203847	4.08708E-09	-5.46187E-20	5.52447E-32	8.80973	3.12473E-12
-11	0.05	350	0.05	795000	100	-0.0842591	8.05293E-10	-7.89853E-22	-3.02889E-32	2.2395	5.93041E-14
-11	0.05	350	0.05	795000	50	-0.0456227	7.90809E-10	-4.33767E-22	-2.0275E-32	1.68626	0
-11	0.05	20	0.01	1200000	100	-1.10622	5.57442E-09	-1.55548E-19	1.50208E-30	17.34	2.77631E-12
-11	0.05	20	0.01	1200000	50	-0.500256	4.71751E-09	-7.0505E-20	8.30021E-32	10.8539	2.98049E-12
-11	0.05	20	0.05	1200000	100	-0.247743	1.05838E-09	-1.99707E-21	-5.41455E-32	3.35194	0
-11	0.05	20	0.05	1200000	50	-0.11241	9.09464E-10	-7.79534E-22	-2.03844E-32	1.94643	0
-31	0.01	350	0.01	1200000	100	-0.617235	3.76184E-09	-7.80547E-20	5.55483E-31	17.0611	1.88905E-12
-31	0.01	350	0.01	1200000	50	-0.315081	3.59307E-09	-3.09407E-20	-2.9066E-31	10.7475	2.2543E-12
-31	0.01	350	0.05	1200000	100	-0.137465	7.23643E-10	-1.07336E-21	-2.68309E-32	3.74649	2.45171E-13
-31	0.01	350	0.05	1200000	50	-0.0579012	7.01421E-10	-7.08905E-23	-1.61259E-32	2.01573	0
-31	0.01	20	0.01	795000	100	-5.34956	2.32919E-08	-1.01487E-18	1.28124E-29	15.2213	4.08656E-12
-31	0.01	20	0.01	795000	50	-2.32512	1.90917E-08	-4.89393E-19	5.76884E-31	11.2106	4.99156E-12
-31	0.01	20	0.05	795000	100	-1.50753	4.46256E-09	-2.27988E-20	-2.51574E-31	3.2785	8.25196E-13
-31	0.01	20	0.05	795000	50	-0.492361	3.64466E-09	-4.47854E-21	-2.33985E-31	2.09555	0
-31	0.01	350	0.01	795000	100	-0.663281	7.31999E-09	-1.88687E-19	1.66393E-30	14.2347	3.86679E-12
-31	0.01	350	0.01	795000	50	-0.415096	7.10858E-09	-1.2829E-19	4.64709E-31	10.8722	4.42356E-12
-31	0.01	350	0.05	795000	100	-0.139774	1.38308E-09	-1.83303E-21	-6.84219E-32	2.69529	7.73346E-13
-31	0.01	350	0.05	795000	50	-0.0604238	1.34747E-09	-4.44672E-22	-5.0214E-32	1.89959	1.40105E-13
-31	0.01	20	0.01	1200000	100	-2.55491	1.02828E-08	-2.68604E-19	1.82734E-30	15.6142	3.25055E-12
-31	0.01	20	0.01	1200000	50	-0.999123	8.33623E-09	-9.1783E-20	-8.84412E-31	9.91666	3.21129E-12
-31	0.01	20	0.05	1200000	100	-0.535442	1.9473E-09	-2.24827E-21	-1.12425E-31	2.97517	0
-31	0.01	20	0.05	1200000	50	-0.182993	1.61503E-09	-2.15265E-22	-4.76001E-32	1.74943	0
-31	0.05	350	0.01	1200000	100	-0.617264	3.7621E-09	-7.80746E-20	5.55912E-31	17.0594	1.88784E-12
-31	0.05	350	0.01	1200000	50	-0.315097	3.59348E-09	-3.09759E-20	-2.90009E-31	10.7464	2.25343E-12
-31	0.05	350	0.05	1200000	100	-0.14033	7.24528E-10	-1.12699E-21	-2.59746E-32	3.74633	2.46096E-13
-31	0.05	350	0.05	1200000	50	-0.0583918	7.01767E-10	-9.27123E-23	-1.57813E-32	2.01548	0
-31	0.05	20	0.01	795000	100	-5.34939	2.32917E-08	-1.01475E-18	1.2807E-29	15.2238	4.08404E-12
-31	0.05	20	0.01	795000	50	-2.31314	1.90854E-08	-4.88741E-19	5.59434E-31	11.205	4.98721E-12
-31	0.05	20	0.05	795000	100	-1.49988	4.46161E-09	-2.27365E-20	-2.52683E-31	3.28072	8.33114E-13
-31	0.05	20	0.05	795000	50	-0.484501	3.64294E-09	-4.38821E-21	-2.35365E-31	2.09622	0
-31	0.05	350	0.01	795000	100	-0.663205	7.3195E-09	-1.88637E-19	1.66291E-30	14.2357	3.86809E-12
-31	0.05	350	0.01	795000	50	-0.413961	7.10639E-09	-1.28119E-19	4.6163E-31	10.8741	4.42542E-12
-31	0.05	350	0.05	795000	100	-0.14725	1.38501E-09	-1.95724E-21	-6.62817E-32	2.6954	7.61023E-13
-31	0.05	350	0.05	795000	50	-0.06001	1.34736E-09	-4.40157E-22	-5.02552E-32	1.89942	1.47166E-13
-31	0.05	20	0.01	1200000	100	-2.58103	1.02945E-08	-2.6951E-19	1.84549E-30	15.6321	3.25411E-12
-31	0.05	20	0.01	1200000	50	-0.999485	8.33616E-09	-9.17699E-20	-8.8472E-31	9.91771	3.21147E-12
-31	0.05	20	0.05	1200000	100	-0.534434	1.94696E-09	-2.22389E-21	-1.12904E-31	2.9753	0
-31	0.05	20	0.05	1200000	50	-0.182747	1.61497E-09	-2.11309E-22	-4.76681E-32	1.74944	0
-*/
