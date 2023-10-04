@@ -6,7 +6,7 @@ clear;
 % Create and save lookup tables for model constants
 
 % Specify the folder where the mat files live.
-myFolder = 'C:\Users\mrnin\Documents\NSC_Lab\H_drive\Simulations\dataAnalysis\lookupTableData';
+myFolder = 'Simulations\dataAnalysis\lookupTableData';
 
 % Make sure the folder exists
 if ~isfolder(myFolder)
