@@ -6,7 +6,7 @@ clear;
 
 % Specify the folder where the mat files live - folder contains all mat
 % files for particular corner over multiple current densities
-folderPattern = 'C:\Users\mrnin\Documents\NSC_Lab\H_drive\Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Xi=*'; 
+folderPattern = 'Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Xi=*'; 
 
 % if there are multiple folders matching pattern, each corresponding to a
 % different parameter corner, loop through folders
