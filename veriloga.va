@@ -73,8 +73,7 @@ parameter real Areaa = 1.2e-9*50e-9;		// cross section area of heavy metal layer
 parameter real thetaSH = 0.05;
 real B_anis = 0;				// B_anis calculated from other params
 
-parameter real c_r = 0.25;			// coefficient of restitution, controls track end bounce, 
-    between 0 and 1
+parameter real c_r = 0.25;			// coefficient of restitution, controls track end bounce, between 0 and 1
 
 // Domain Wall motion variables
 real Pdw;				//measured in m, not nm
@@ -156,21 +155,14 @@ begin
     			B_anis = (Ku/(0.5*Msat) - (4*`M_PI*1e-7)*Msat)*1000;
 		end
 
-//Comment out the following block if constants c0-c3, drift_const, and k6 manually set.
-		//read in constant values for specific parameter corner from lookup table files 
-    (included on github).
-		c0 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
-    "lookup_maxVel_c0.tbl", "1L,1L,1L,1L,1L,1L");
-		c1 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
-    "lookup_maxVel_c1.tbl", "1L,1L,1L,1L,1L,1L");
-		c2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
-    "lookup_maxVel_c2.tbl", "1L,1L,1L,1L,1L,1L");
-		c3 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
-    "lookup_maxVel_c3.tbl", "1L,1L,1L,1L,1L,1L");
-		drift_const = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
-    "lookup_drift_const.tbl", "1L,1L,1L,1L,1L,1L");
-		k6 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, 
-    "lookup_k6.tbl", "1L,1L,1L,1L,1L,1L");
+		//Comment out the following block if constants c0-c3, drift_const, and k6 manually set.
+		//read in constant values for specific parameter corner from lookup table files (included on github).
+		c0 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c0.tbl", "1L,1L,1L,1L,1L,1L");
+		c1 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c1.tbl", "1L,1L,1L,1L,1L,1L");
+		c2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c2.tbl", "1L,1L,1L,1L,1L,1L");
+		c3 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c3.tbl", "1L,1L,1L,1L,1L,1L");
+		drift_const = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_drift_const.tbl", "1L,1L,1L,1L,1L,1L");
+		k6 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_k6.tbl", "1L,1L,1L,1L,1L,1L");
 		
 		// calculate other constants
 		k5 =  1/drift_const; 
@@ -182,8 +174,7 @@ begin
 
 	end
 
-	//if pos of DW below (left of) MTJ, current through wall determined by left pin (P) and 
-    MTJ voltage
+	//if pos of DW below (left of) MTJ, current through wall determined by left pin (P) and MTJ voltage
 	if(Pdw < ((Pdw_low + Pdw_high)/2))
 	begin
 		IPQPQ = I(P, Vmiddle);
@@ -219,8 +210,7 @@ begin
 	end
 
 	// Calculation of acceleration, velocity, position
-	Adw = - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + 
-    k1*abs(Jdenss)) - (k5 + k6*abs(Jdenss))*Vdw;	// [nm/ns^2]
+	Adw = - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss)) - (k5 + k6*abs(Jdenss))*Vdw;	// [nm/ns^2]
 	Vdw = Vdw + Adw * dt;															// [nm/ns = m/s]
 	Pdw = Pdw + Vdw * dt*1e-9;														// [m]
 	
@@ -266,8 +256,7 @@ begin
 	else
 	begin 
 
-		Req = ((Pdw_high - Pdw_low) * Rp_eq * Rap_eq) / ((Rp_eq * (Pdw - Pdw_low)) + ( Rap_eq
-    * (Pdw_high - Pdw)));
+		Req = ((Pdw_high - Pdw_low) * Rp_eq * Rap_eq) / ((Rp_eq * (Pdw - Pdw_low)) + ( Rap_eq * (Pdw_high - Pdw)));
 	end
 
 	RR = (Pdw_limit-Pdw_low-10n)/(Pdw_limit)*Rtotal;
@@ -280,8 +269,7 @@ begin
 	I(Vmiddle, RA) <+ V(Vmiddle, RA) / Req;
 
 	// Components of acceleration split up, measurable on ports
-	Metr(A_J) <+ - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + 
-    k2*(abs(Jdenss)**2) + k1*abs(Jdenss));
+	Metr(A_J) <+ - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss));
 	Metr(A_k5) <+ -k5*Vdw;
 	Metr(A_k6) <+ - k6*abs(Jdenss)*Vdw;
 
