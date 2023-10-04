@@ -1,5 +1,4 @@
-//"DWSim_V=centerWall_Geom=1_Aex=11e-12_Xi=0.01_Ku=4.05e+5_A=0.01_Msat=7.95e+5_
-    u0Hke=NaN_DMI=NaN_J=4.0e+09_RT=100e-9_W=100e-9.mx3"
+//"DWSim_V=centerWall_Geom=1_Aex=11e-12_Xi=0.01_Ku=4.05e+5_A=0.01_Msat=7.95e+5_u0Hke=NaN_DMI=NaN_J=4.0e+09_RT=100e-9_W=100e-9.mx3"
 
 // sample mumax3 script for simple constant current pulse input
 // The mumax script naming convention should be followed since extract_DW_motion.m 
@@ -43,15 +42,13 @@ fixedlayer.setregion(0, vector(0,1,0) )
 
 relax()
 
-// keep DW centered in simulation window by shifting simulation window
-ext_centerWall(2)
+// keep DW centered in simulation window by shifting simulation window ext_centerWall(2)
 
 //autosnapshot(m, 10e-12)
 
-// save magnetization state and simulation window shift amount to table, 
-    use to calculate position
+// save magnetization state and simulation window shift amount to table, use to calculate position
 for i := 0; i <= 499; i += 1 {
-tableadd(Crop(m.comp(2), i, (i+1),30,32,0,1))
+    tableadd(Crop(m.comp(2), i, (i+1),30,32,0,1))
 }
 tableadd(ext_dwpos)
 tableadd(ext_dwspeed)
