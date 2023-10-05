@@ -13,7 +13,7 @@ discipline Distance
 enddiscipline
 
 module DW_kinematic_model(P, Q, DW_Position, RA, DW_Velocity, DW_MC, DW_Req,DW_J,A_J,
-    A_k5,A_k6);
+    A_d1,A_d2);
 
 inout P, Q;					//P is defined as the left port of the DW track, and Q is the right port.
 inout RA;					//MTJ output port
@@ -24,8 +24,8 @@ output DW_J;					//This port measures the effective DW track current density, in
 
 // Ports measuring various acceleration contributions, for tracking
 output A_J;
-output A_k5;
-output A_k6;
+output A_d1;
+output A_d2;
 
 electrical P, Q;
 electrical RA;
@@ -104,12 +104,12 @@ real k1;
 real k2;
 real k3;
 real k4;
-real k5;
-real k6; //Change to "parameter real" to set manually.
+real d1;
+real d2; //Change to "parameter real" to set manually.
 
 Distance A_J;
-Distance A_k5;
-Distance A_k6;
+Distance A_d1;
+Distance A_d2;
 
 //------------------------------------MTJ resistance voltage dependence section
 
@@ -155,22 +155,22 @@ begin
     			B_anis = (Ku/(0.5*Msat) - (4*`M_PI*1e-7)*Msat)*1000;
 		end
 
-		//Comment out the following block if constants c0-c3, drift_const, and k6 manually set.
+		//Comment out the following block if constants c0-c3, drift_const, and d2 manually set.
 		//read in constant values for specific parameter corner from lookup table files (included on github).
 		c0 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c0.tbl", "1L,1L,1L,1L,1L,1L");
 		c1 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c1.tbl", "1L,1L,1L,1L,1L,1L");
 		c2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c2.tbl", "1L,1L,1L,1L,1L,1L");
 		c3 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c3.tbl", "1L,1L,1L,1L,1L,1L");
 		drift_const = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_drift_const.tbl", "1L,1L,1L,1L,1L,1L");
-		k6 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_k6.tbl", "1L,1L,1L,1L,1L,1L");
+		d2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_d2.tbl", "1L,1L,1L,1L,1L,1L");
 		
 		// calculate other constants
-		k5 =  1/drift_const; 
-		k0 = k5*c0;
-    		k1 = k5*c1 + k6*c0;
-    		k2 = k5*c2 + k6*c1;
-    		k3 = k5*c3 + k6*c2;
-    		k4 = k6*c3;
+		d1 =  1/drift_const;
+		k0 = d1*c0;
+    		k1 = d1*c1 + d2*c0;
+    		k2 = d1*c2 + d2*c1;
+    		k3 = d1*c3 + d2*c2;
+    		k4 = d2*c3;
 
 	end
 
@@ -210,7 +210,7 @@ begin
 	end
 
 	// Calculation of acceleration, velocity, position
-	Adw = - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss)) - (k5 + k6*abs(Jdenss))*Vdw;	// [nm/ns^2]
+	Adw = - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss)) - (d1 + d2*abs(Jdenss))*Vdw;	// [nm/ns^2]
 	Vdw = Vdw + Adw * dt;															// [nm/ns = m/s]
 	Pdw = Pdw + Vdw * dt*1e-9;														// [m]
 	
@@ -270,8 +270,8 @@ begin
 
 	// Components of acceleration split up, measurable on ports
 	Metr(A_J) <+ - J_sign*(k0 + k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss));
-	Metr(A_k5) <+ -k5*Vdw;
-	Metr(A_k6) <+ - k6*abs(Jdenss)*Vdw;
+	Metr(A_d1) <+ -d1*Vdw;
+	Metr(A_d2) <+ - d2*abs(Jdenss)*Vdw;
 
 	// domain wall motion variables, current and current density measurable on ports
 	Metr(DW_Req) <+ Req;

@@ -30,7 +30,7 @@ interp_maxVel_c1 = [];
 interp_maxVel_c2 = [];
 interp_maxVel_c3 = [];
 interp_drift_const = [];
-interp_k6 = [];
+interp_d2 = [];
 
 % list of param corner to keep track of order constants were saved to above tables
 param_list = [];
@@ -41,7 +41,7 @@ ind = 0; % cutoff index for max current used
 %loop through all param corner .mat files
 for k = 1 : length(theFiles)
     
-    %load matrix (dataTable) with 5 rows: current, and corresponding maxVel/timeConstant/driftDist/velJump
+    %load matrix (dataTable) with 4 rows: current, and corresponding maxVel/timeConstant/driftDist
     baseFileName = theFiles(k).name;
     fullFileName = fullfile(theFiles(k).folder, baseFileName);
     load(fullFileName);
@@ -89,7 +89,6 @@ for k = 1 : length(theFiles)
         maxVel = maxVel(1:maxJind);
         timeConstant = timeConstant(1:maxJind);
         driftDist = driftDist(1:maxJind);
-        velJump = velJump(1:maxJind);
 
         disp(strcat("Changing current maximum to ",sprintf('%0.2e',J(end))," for ",mat2str(current_param)));
     end
@@ -110,7 +109,7 @@ for k = 1 : length(theFiles)
     c0 = cubic_coeffs(4);
     
     %fit drift dist to linear model
-    driftDistPlot = [maxVel-velJump; driftDist];
+    driftDistPlot = [maxVel; driftDist];
     %add weight to earlier (smaller valued) part of fit
     w = driftDistPlot(2,:).^-1;
     linModel = @(b,x) b(1).*x;
@@ -120,9 +119,9 @@ for k = 1 : length(theFiles)
     
     
     %time const has inverse proportional relationship to J
-    k6 = J'\(timeConstant.^-1 - 1/drift_fit)';
-    if(k6<0)
-        k6 = 0;
+    d2 = J'\(timeConstant.^-1 - 1/drift_fit)';
+    if(d2<0)
+        d2 = 0;
     end
     
     % update lists with model constants for this corner
@@ -131,7 +130,7 @@ for k = 1 : length(theFiles)
     interp_maxVel_c2 = cat(1,interp_maxVel_c2,c2);
     interp_maxVel_c3 = cat(1,interp_maxVel_c3,c3);
     interp_drift_const = cat(1,interp_drift_const,drift_fit);
-    interp_k6 = cat(1,interp_k6,k6);
+    interp_d2 = cat(1,interp_d2,d2);
     
     
 end
@@ -169,15 +168,10 @@ formatSpec = '%g %g %g %g %g %g %g\n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_drift_const)');
 fclose(fid);
 
-fid = fopen(fullfile(myFolder, 'lookup_k6.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), k6 \n');
+fid = fopen(fullfile(myFolder, 'lookup_d2.tbl'),'w+');
+fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), d2 \n');
 formatSpec = '%g %g %g %g %g %g %g\n';
-fprintf(fid,formatSpec,cat(2,param_list,interp_k6)');
+fprintf(fid,formatSpec,cat(2,param_list,interp_d2)');
 fclose(fid);
 
-fid = fopen(fullfile(myFolder, 'lookup_k7.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), k7 \n');
-formatSpec = '%g %g %g %g %g %g %g\n';
-fprintf(fid,formatSpec,cat(2,param_list,interp_k7)');
-fclose(fid);
 
