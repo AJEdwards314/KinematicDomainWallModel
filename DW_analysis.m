@@ -6,7 +6,8 @@ clear;
 
 % Specify the folder where the mat files live - folder contains all mat
 % files for particular corner over multiple current densities
-folderPattern = 'Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Xi=*'; 
+% example folder format: ".\Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Xi=0.01_Ku=1.11e+6_A=0.05_Msat=1.2e+6"
+folderPattern = '.\Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Xi=*'; 
 
 % if there are multiple folders matching pattern, each corresponding to a
 % different parameter corner, loop through folders
@@ -87,6 +88,9 @@ for n = 1: length(folders)
             end
         end
 
+        % smooth velocity
+        smoothVel = smoothdata(dwVelocity,'gaussian',150);
+
         %plot position/velocity figure
         %{
         figure(1); %create new figure
@@ -97,9 +101,6 @@ for n = 1: length(folders)
         hold on;
         ylabel ('Domain wall position (nm)');
         xlabel ('Time (ns)');
-
-        % plot smoothed velocity
-        smoothVel = smoothdata(dwVelocity,'gaussian',150);
 
         yyaxis right;
         ylabel ('Domain wall velocity (m/s)','Color','r' );

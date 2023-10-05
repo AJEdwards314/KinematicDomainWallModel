@@ -4,7 +4,7 @@ clear
 %read in mumax table files from specified folder, output excel and .mat files with position and velcity extracted
 
 % Specify the folder where the files live.
-myFolder = 'C:\Users\mrnin\Documents\NSC_Lab\H_drive\Simulations';
+myFolder = '.\Simulations';
 
 % Check to make sure that folder actually exists.  Warn user if it doesn't.
 if ~isfolder(myFolder)
@@ -79,6 +79,7 @@ for k = 1 : length(theFiles)
     rtVal = split(rtFind, "=");
     rtVal2 = extractBefore(rtVal, "e");
     rtDWBase = str2double(rtVal2(2));
+    rtDW = str2double(rtVal(2));
     
     %reset the current
     Current = zeros(1,rows);

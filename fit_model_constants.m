@@ -35,8 +35,6 @@ interp_d2 = [];
 % list of param corner to keep track of order constants were saved to above tables
 param_list = [];
 
-ind = 0; % cutoff index for max current used
-
 
 %loop through all param corner .mat files
 for k = 1 : length(theFiles)
@@ -46,11 +44,18 @@ for k = 1 : length(theFiles)
     fullFileName = fullfile(theFiles(k).folder, baseFileName);
     load(fullFileName);
 
+    % use ind as upper index, to prevent fitting to data points with J>4e10
+    ind = find(dataTable(1,:)>=4e10, 1); 
+    if(isempty(ind))
+        ind = length(dataTable(1,:));
+    end
+
     % create seperate lists for quantities read in from .mat file
     J = dataTable(1,1:ind);
     maxVel = dataTable(2,1:ind);
     timeConstant = dataTable(3,1:ind)*1e9;
     driftDist = dataTable(4,1:ind)*1e9;
+    disp(dataTable);
     
     %get parameter values for current parameter set
     fileNameParsed = split(baseFileName, "_");
@@ -73,12 +78,6 @@ for k = 1 : length(theFiles)
     % keep order of param coords to match interp_ matricies for later interp
     current_param = [Aex_s,Xi_s,B_anis_s,A_s,Msat_s,W_s];
     param_list = cat(1,param_list,current_param);
-    
-    % use ind as upper index, to prevent fitting to data points with J>4e10
-    ind = find(dataTable(1,:)>=4e10, 1); 
-    if(isempty(ind))
-        ind = length(dataTable(1,:));
-    end
     
     
     %only include current range where max velocity increases with current
