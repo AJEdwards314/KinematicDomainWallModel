@@ -20,6 +20,3 @@ Supplementary information for "Kinematic Model of Magnetic Domain Wall Motion fo
 ### DWSim_V=centerWall_Geom=1_Aex=11e-12_Xi=0.01_Ku=4.05e+5_A=0.01_Msat=7.95e+5_u0Hke=NaN_DMI=NaN_J=4.0e+09_RT=100e-9_W=100e-9.mx3
 - sample mumax3 script for simple constant current pulse input
 - The mumax script naming convention should be followed since extract_DW_motion.m uses the naming convention to associate the DW position and the micromagnetic parameters.
-
-### DWSim_V=multiStep_Geom=1_Aex=11e-12_Xi=0.01_Ku=4.05e+5_A=0.01_Msat=7.95e+5_u0Hke=NaN_DMI=NaN_J=NaN_RT=NaN_W=100e-9.mx3
-- sample mumax3 script for piecewise step current input
