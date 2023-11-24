@@ -197,8 +197,9 @@ for k = 1 : length(theFiles)
     
     % save time, position, and velocity to .mat file
     time = time';
-    dwPosition = dwPositionShift'*1e-9;
-    dwVelocity = (delta/1e9)';
+    positionStep = 1e-9;
+    dwPosition = dwPositionShift'*positionStep;
+    dwVelocity = (delta*positionStep)';
     save(fullfile(theFiles(k).folder, strcat(baseFileName, '.mat')), 'time', 'dwPosition', 'dwVelocity');
     
     %next subtract these
