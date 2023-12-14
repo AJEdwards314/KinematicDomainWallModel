@@ -6,6 +6,10 @@ clear
 % Specify the folder where the files live.
 myFolder = '.\Simulations';
 
+% Set to 1 to save data excel sheets along with the default .mat format
+% Requires xlswritefig package from https://mathworks.com/matlabcentral/fileexchange/24424-xlswritefig
+write_xlsx = 0;
+
 % Check to make sure that folder actually exists.  Warn user if it doesn't.
 if ~isfolder(myFolder)
     errorMessage = sprintf('Error: The following folder does not exist:\n%s\nPlease specify a new folder.', myFolder);
@@ -40,8 +44,10 @@ for k = 1 : length(theFiles)
     fileNameParsed = split(fullFileName, "_");
     
     %create an excel file and write parameters to it
-    fullNameExcel = [fullFileName '.xlsx'];
-    writecell(fileNameParsed,fullNameExcel);
+    if write_xlsx == 1
+        fullNameExcel = [fullFileName '.xlsx'];
+        writecell(fileNameParsed,fullNameExcel);
+    end
     
     %need to read in the table.txt file from this file
     %this is what we will be performing the original matlab code on
@@ -69,17 +75,17 @@ for k = 1 : length(theFiles)
     dDiff = dataShift-dataAnalyzed(:,5:columns-2); % Think of this as a discrete derivative of d (dd/dx)
     x = 5:columns-2;
     
-    %get what J (current density) is for DW is
-    jFind = fileNameParsed(13); % depends on file path
-    jVal = split(jFind, "=");
-    jDW = str2double(jVal(2));
+    [~, filename_noext, ~] = fileparts(baseFileName);
     
-    %get runtime for this DW
-    rtFind = fileNameParsed(14);
-    rtVal = split(rtFind, "=");
-    rtVal2 = extractBefore(rtVal, "e");
-    rtDWBase = str2double(rtVal2(2));
-    rtDW = str2double(rtVal(2));
+    %get what J (current density) is for DW is
+    jVal = regexp(filename_noext, '_J=([^_]+)', 'tokens');
+    jVal = jVal{1}{1};
+    jDW = str2double(jVal);
+    
+    %get runtime for this DW    
+    rtVal = regexp(filename_noext, '_RT=([^_]+)', 'tokens');
+    rtVal = rtVal{1}{1};
+    rtDW = str2double(rtVal);
     
     %reset the current
     Current = zeros(1,rows);
@@ -101,9 +107,9 @@ for k = 1 : length(theFiles)
     end
     dwPositionShift = dwPosition + dataAnalyzed(:,columns-1)'*1e9 - dwPosition(1);
 
-    dwPosition1 = dwPosition( floor((rows+1)/2) );
-    dwPosition0 = dwPosition(1);
-    calculatedSlope = (dwPosition1 - dwPosition0)/(rtDWBase);
+    dwPosition1 = dwPosition( floor((rows+1)/2) );        %nm
+    dwPosition0 = dwPosition(1);                          %nm
+    calculatedSlope = (dwPosition1 - dwPosition0) * 1e-9/(rtDW); %m/s
 
     %mute figures
     set(0, 'DefaultFigureVisible', 'off');
@@ -121,7 +127,9 @@ for k = 1 : length(theFiles)
     
     %second page should be the plot from the data gathered above for both current
     %and position
-    xlswritefig(p,fullNameExcel,'Sheet2','A1');
+    if write_xlsx == 1
+        xlswritefig(p,fullNameExcel,'Sheet2','A1');
+    end 
     hold off;
     
     %print the plot points on sheet three that coincide with the figures
@@ -133,20 +141,22 @@ for k = 1 : length(theFiles)
     out1 = 'Current Density (10^1^2 Am^-^2) By Time (ns)';
     out2 = 'Domain wall position (nm) By Time (ns)';
     
-    try
-        xlswrite(fullNameExcel,cellstr(out1),'Sheet3','A1');
-        xlswrite(fullNameExcel,x{1},'Sheet3','A2');
-        xlswrite(fullNameExcel,y{1},'Sheet3','A3');
-    catch
-        disp("couldn't write to excel");
-    end
-    
-    try
-        xlswrite(fullNameExcel,cellstr(out2),'Sheet3','A5');
-        xlswrite(fullNameExcel,x{2},'Sheet3','A6');
-        xlswrite(fullNameExcel,y{2},'Sheet3','A7');
-    catch
-        disp("couldn't write to excel");
+    if write_xlsx == 1
+        try
+            xlswrite(fullNameExcel,cellstr(out1),'Sheet3','A1');
+            xlswrite(fullNameExcel,x{1},'Sheet3','A2');
+            xlswrite(fullNameExcel,y{1},'Sheet3','A3');
+        catch
+            disp("couldn't write to excel");
+        end
+
+        try
+            xlswrite(fullNameExcel,cellstr(out2),'Sheet3','A5');
+            xlswrite(fullNameExcel,x{2},'Sheet3','A6');
+            xlswrite(fullNameExcel,y{2},'Sheet3','A7');
+        catch
+            disp("couldn't write to excel");
+        end
     end
     
     %next need to calculate the velocity
@@ -178,7 +188,7 @@ for k = 1 : length(theFiles)
     v = plot(time*1e9,delta/1e9,'r');
     
     %add velocity plot to second page
-    xlswritefig(v,fullNameExcel,'Sheet2','M1');
+    %xlswritefig(v,fullNameExcel,'Sheet2','M1');
 
     fig2 = findobj(figure(2), 'Type', 'Line' );
     
@@ -187,12 +197,14 @@ for k = 1 : length(theFiles)
     
     out3 = 'Domain wall velocity (nm) By Time (ns)';
     
-    try
-        xlswrite(fullNameExcel,cellstr(out3),'Sheet3','A9');
-        xlswrite(fullNameExcel,x2{1},'Sheet3','A10');
-        xlswrite(fullNameExcel,y2{1},'Sheet3','A11');
-    catch
-        disp("couldn't write to excel");
+    if write_xlsx == 1
+        try
+            xlswrite(fullNameExcel,cellstr(out3),'Sheet3','A9');
+            xlswrite(fullNameExcel,x2{1},'Sheet3','A10');
+            xlswrite(fullNameExcel,y2{1},'Sheet3','A11');
+        catch
+            disp("couldn't write to excel");
+        end
     end
     
     % save time, position, and velocity to .mat file

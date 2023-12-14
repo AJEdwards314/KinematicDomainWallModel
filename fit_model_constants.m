@@ -58,13 +58,32 @@ for k = 1 : length(theFiles)
     disp(dataTable);
     
     %get parameter values for current parameter set
-    fileNameParsed = split(baseFileName, "_");
-    Aex_s = str2double(extractAfter(fileNameParsed(2),"=")) * 1e12;
-    Xi_s = str2double(extractAfter(fileNameParsed(3),"="));
-    Ku_s = str2double(extractAfter(fileNameParsed(4),"="));
-    A_s = str2double(extractAfter(fileNameParsed(5),"="));
-    Msat_s = str2double(extractAfter(fileNameParsed(6),"="));
-    W_s = str2double(extractBetween(fileNameParsed(7),"=","."))* 1e9; 
+    [~, filename_noext, ~] = fileparts(baseFileName);
+    
+    AexVal = regexp(filename_noext, '_Aex=([^_]+)', 'tokens');
+    AexVal = AexVal{1}{1};
+    Aex_s = str2double(AexVal) * 1e12; %pJ/m
+    
+    XiVal = regexp(filename_noext, '_Xi=([^_]+)', 'tokens');
+    XiVal = XiVal{1}{1};
+    Xi_s = str2double(XiVal); %Unitless
+    
+    KuVal = regexp(filename_noext, '_Ku=([^_]+)', 'tokens');
+    KuVal = KuVal{1}{1};
+    Ku_s = str2double(KuVal); %J/m^3
+    
+    AVal = regexp(filename_noext, '_A=([^_]+)', 'tokens');
+    AVal = AVal{1}{1};
+    A_s = str2double(AVal); %Unitless
+    
+    MsatVal = regexp(filename_noext, '_Msat=([^_]+)', 'tokens');
+    MsatVal = MsatVal{1}{1};
+    Msat_s = str2double(MsatVal); %A/m
+    
+    WVal = regexp(filename_noext, '_W=([^_]+)', 'tokens');
+    WVal = WVal{1}{1};
+    W_s = str2double(WVal) * 1e9; %nm
+    
     
     % Using B anis in lookup table instead of Ku
     if(Ku_s == 1.11e6 || Ku_s == 5.36e5)

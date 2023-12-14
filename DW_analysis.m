@@ -60,17 +60,17 @@ for n = 1: length(folders)
             load(fullFileName);
         end
 
-
+        [~, filename_noext, ~] = fileparts(baseFileName);
+    
         %get what J (current density) is for DW is
-        jFind = fileNameParsed(11);     % Depends on # of underscores in path to file
-        jVal = split(jFind, "=");
-        jDW = str2double(jVal(2));
-
+        jVal = regexp(filename_noext, '_J=([^_]+)', 'tokens');
+        jVal = jVal{1}{1};
+        jDW = str2double(jVal)
+    
         %get runtime for this DW
-        rtFind = fileNameParsed(12);
-        rtVal = split(rtFind, "=");
-        %rtVal2 = extractBefore(rtVal, ".out");
-        rtDW = str2double(rtVal(2));
+        rtVal = regexp(filename_noext, '_RT=([^_]+)', 'tokens');
+        rtVal = rtVal{1}{1};
+        rtDW = str2double(rtVal)
 
         %reset the current
         Current = zeros(1,length(time));
