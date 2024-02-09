@@ -42,7 +42,8 @@ fixedlayer.setregion(0, vector(0,1,0) )
 
 relax()
 
-// keep DW centered in simulation window by shifting simulation window ext_centerWall(2)
+// keep DW centered in simulation window by shifting simulation window 
+ext_centerWall(2)
 
 //autosnapshot(m, 10e-12)
 
