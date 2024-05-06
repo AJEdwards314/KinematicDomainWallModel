@@ -2,12 +2,13 @@ close all;
 clear;
 
 % Calculates various quantities (drift distance, time constant of velocity, max velocity) for each current density
+% Creates a table compiling calculated quantities for each current density within a parameter corner
 % Should be run after extract_DW_motion, using the output .mat files
 
 % Specify the folder where the mat files live - folder contains all mat
 % files for particular corner over multiple current densities
-% example folder format: ".\Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Xi=0.01_Ku=1.11e+6_A=0.05_Msat=1.2e+6"
-folderPattern = '.\Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Xi=*'; 
+% example folder format: ".\Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Ku=1.11e+6_A=0.05_Msat=1.2e+6"
+folderPattern = '.\Simulations\dataAnalysis\W=50e-9\Aex=11e-12\Ku=*'; 
 
 % if there are multiple folders matching pattern, each corresponding to a
 % different parameter corner, loop through folders
@@ -92,11 +93,11 @@ for n = 1: length(folders)
         smoothVel = smoothdata(dwVelocity,'gaussian',150);
 
         %plot position/velocity figure
-        %{
+        
         figure(1); %create new figure
 
         %plot the position vs time on y axis & plot velocity vs time on
-        %yy axis
+        yyaxis left;
         plot(time*1e9,dwPosition*1e9,'b','DisplayName','DW position');
         hold on;
         ylabel ('Domain wall position (nm)');
@@ -105,7 +106,7 @@ for n = 1: length(folders)
         yyaxis right;
         ylabel ('Domain wall velocity (m/s)','Color','r' );
         set(gca,'ycolor','r');
-        plot(time*1e9,smoothVel,'-','Color','r','DisplayName','DW velocity');
+        plot(time*1e9,smoothVel,'Color','r','DisplayName','DW velocity');
         legend()
 
 
@@ -148,15 +149,19 @@ for n = 1: length(folders)
         end
 
         % clear figures
-        % clf(figure(1));
-        % clf(figure(2));
+        clf(figure(1));
+        clf(figure(2));
     end
 
+    %for naming, get string with Aex, Ku, A, Msat, W
+    Aex_str = strcat('Aex=', extractBetween(baseFileName,'Aex=','_'), '_');
+    Ku_str = strcat('Ku=', extractBetween(baseFileName,'Ku=','_'), '_');
+    A_str = strcat('A=', extractBetween(baseFileName,'A=','_'), '_');
+    Msat_str = strcat('Msat=', extractBetween(baseFileName,'Msat=','_'), '_');
+    W_str = strcat('W=', extractBetween(baseFileName,'W=','.'));
+    substr = char(strcat(Aex_str, Ku_str, A_str, Msat_str, W_str));
+    disp(substr);
 
-    %for naming
-    underscores = strfind(baseFileName, '_');
-    width = extractBetween(baseFileName, underscores(12), '.');     % depends on path to files
-    substr = char(strcat(baseFileName(underscores(3)+1:underscores(8)-1),width));
 
     % compile quantities into single table, sort table by current density
     dataTable = [jVals; maxVel; timeConstant; driftDist];

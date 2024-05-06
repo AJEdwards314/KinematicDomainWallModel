@@ -63,13 +63,12 @@ parameter real dt = 1e-3;			// time step (in ns)
 
 // micromagnetic parameters
 parameter real Aex = 11e-12;
-parameter real Xi = 0.01;
 parameter real Ku = 9.17e5;
 parameter real Msat = 1.2e6;
 parameter real alpha = 0.01;
 parameter real DW_width = 50e-9;
 parameter real DW_thickness = 1.2e-9;
-parameter real Areaa = 1.2e-9*50e-9;		// cross section area of heavy metal layer
+real Areaa = DW_thickness*DW_width;		// cross section area of heavy metal layer
 parameter real thetaSH = 0.05;
 real B_anis = 0;				// B_anis calculated from other params
 
@@ -157,12 +156,12 @@ begin
 
 		//Comment out the following block if constants c0-c3, drift_const, and d2 manually set.
 		//read in constant values for specific parameter corner from lookup table files (included on github).
-		c0 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c0.tbl", "1L,1L,1L,1L,1L,1L");
-		c1 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c1.tbl", "1L,1L,1L,1L,1L,1L");
-		c2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c2.tbl", "1L,1L,1L,1L,1L,1L");
-		c3 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c3.tbl", "1L,1L,1L,1L,1L,1L");
-		drift_const = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_drift_const.tbl", "1L,1L,1L,1L,1L,1L");
-		d2 = $table_model (Aex*1e12, Xi, B_anis,alpha,Msat,DW_width*1e9, "lookup_d2.tbl", "1L,1L,1L,1L,1L,1L");
+		c0 = $table_model (Aex*1e12, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c0.tbl", "1L,1L,1L,1L,1L");
+		c1 = $table_model (Aex*1e12, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c1.tbl", "1L,1L,1L,1L,1L");
+		c2 = $table_model (Aex*1e12, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c2.tbl", "1L,1L,1L,1L,1L");
+		c3 = $table_model (Aex*1e12, B_anis,alpha,Msat,DW_width*1e9, "lookup_maxVel_c3.tbl", "1L,1L,1L,1L,1L");
+		drift_const = $table_model (Aex*1e12, B_anis,alpha,Msat,DW_width*1e9, "lookup_drift_const.tbl", "1L,1L,1L,1L,1L");
+		d2 = $table_model (Aex*1e12, B_anis,alpha,Msat,DW_width*1e9, "lookup_d2.tbl", "1L,1L,1L,1L,1L");
 		
 		// calculate other constants
 		d1 =  1/drift_const;

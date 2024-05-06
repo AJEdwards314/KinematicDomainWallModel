@@ -64,10 +64,6 @@ for k = 1 : length(theFiles)
     AexVal = AexVal{1}{1};
     Aex_s = str2double(AexVal) * 1e12; %pJ/m
     
-    XiVal = regexp(filename_noext, '_Xi=([^_]+)', 'tokens');
-    XiVal = XiVal{1}{1};
-    Xi_s = str2double(XiVal); %Unitless
-    
     KuVal = regexp(filename_noext, '_Ku=([^_]+)', 'tokens');
     KuVal = KuVal{1}{1};
     Ku_s = str2double(KuVal); %J/m^3
@@ -94,8 +90,8 @@ for k = 1 : length(theFiles)
         B_anis_s = (Ku_s/(0.5*Msat_s) - (4*pi*1e-7)*Msat_s)*1000;
     end
 
-    % keep order of param coords to match interp_ matricies for later interp
-    current_param = [Aex_s,Xi_s,B_anis_s,A_s,Msat_s,W_s];
+    % keep order of param coords to match interp_ matrices for later interp
+    current_param = [Aex_s,B_anis_s,A_s,Msat_s,W_s];
     param_list = cat(1,param_list,current_param);
     
     
@@ -105,6 +101,7 @@ for k = 1 : length(theFiles)
         
         J = J(1:maxJind);
         maxVel = maxVel(1:maxJind);
+        disp(maxVel);
         timeConstant = timeConstant(1:maxJind);
         driftDist = driftDist(1:maxJind);
 
@@ -150,45 +147,44 @@ for k = 1 : length(theFiles)
     interp_drift_const = cat(1,interp_drift_const,drift_fit);
     interp_d2 = cat(1,interp_d2,d2);
     
-    
 end
 
 % write lookup tables to .tbl files
 % one lookup table per model constant, lists all param corners with corresponding model constant value
 
 fid = fopen(fullfile(myFolder, 'lookup_maxVel_c0.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), c0 \n');
-formatSpec = '%g %g %g %g %g %g %g\n';
+fprintf(fid,'#Aex(*1e12), B_anis, A, Msat, W(nm), c0 \n');
+formatSpec = '%g %g %g %g %g %g \n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_maxVel_c0)');
 fclose(fid);
 
 fid = fopen(fullfile(myFolder, 'lookup_maxVel_c1.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), c1 \n');
-formatSpec = '%g %g %g %g %g %g %g\n';
+fprintf(fid,'#Aex(*1e12), B_anis, A, Msat, W(nm), c1 \n');
+formatSpec = '%g %g %g %g %g %g \n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_maxVel_c1)');
 fclose(fid);
 
 fid = fopen(fullfile(myFolder, 'lookup_maxVel_c2.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), c2 \n');
-formatSpec = '%g %g %g %g %g %g %g\n';
+fprintf(fid,'#Aex(*1e12), B_anis, A, Msat, W(nm), c2 \n');
+formatSpec = '%g %g %g %g %g %g \n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_maxVel_c2)');
 fclose(fid);
 
 fid = fopen(fullfile(myFolder, 'lookup_maxVel_c3.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), c3 \n');
-formatSpec = '%g %g %g %g %g %g %g\n';
+fprintf(fid,'#Aex(*1e12), B_anis, A, Msat, W(nm), c3 \n');
+formatSpec = '%g %g %g %g %g %g \n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_maxVel_c3)');
 fclose(fid);
 
 fid = fopen(fullfile(myFolder, 'lookup_drift_const.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), drift_const \n');
-formatSpec = '%g %g %g %g %g %g %g\n';
+fprintf(fid,'#Aex(*1e12), B_anis, A, Msat, W(nm), drift_const \n');
+formatSpec = '%g %g %g %g %g %g \n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_drift_const)');
 fclose(fid);
 
 fid = fopen(fullfile(myFolder, 'lookup_d2.tbl'),'w+');
-fprintf(fid,'#Aex(*1e12), Xi, B_anis, A, Msat, W(nm), d2 \n');
-formatSpec = '%g %g %g %g %g %g %g\n';
+fprintf(fid,'#Aex(*1e12), B_anis, A, Msat, W(nm), d2 \n');
+formatSpec = '%g %g %g %g %g %g \n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_d2)');
 fclose(fid);
 
