@@ -17,7 +17,7 @@ Supplementary information for "Kinematic Model of Magnetic Domain Wall Motion fo
 ### veriloga.va
 - VerilogA code for SPICE device implementation
 
-### DWSim_V=centerWall_Geom=1_Aex=11e-12_Xi=0.01_Ku=4.05e+5_A=0.01_Msat=7.95e+5_u0Hke=NaN_DMI=NaN_J=4.0e+09_RT=100e-9_W=100e-9.mx3
+### DWSim_V=centerWall_Geom=1_Aex=11e-12_Ku=4.05e+5_A=0.01_Msat=7.95e+5_u0Hke=NaN_DMI=NaN_J=4.0e+09_RT=100e-9_W=100e-9.mx3
 - sample mumax3 script for simple constant current pulse input
 - The mumax script naming convention should be followed since extract_DW_motion.m uses the naming convention to associate the DW position and the micromagnetic parameters.
 
@@ -60,7 +60,7 @@ All output .mat files from _DW\_analysis.m_ should be collected into a single fo
 
 Parameter, stimuli, and timing information of the Mumax3 scripts are communicated in the file and folder names.  It is therefore important to follow the naming convention.  Mumax3 script filenames should be similar to the following:
 
-DWSim_V=centerWall_Geom=1_Aex=11e-12_Xi=0.01_Ku=4.05e+5_A=0.01_Msat=7.95e+5_u0Hke=NaN_DMI=NaN_J=4.0e+09_RT=100e-9_W=100e-9.mx3
+DWSim_V=centerWall_Geom=1_Aex=11e-12_Ku=4.05e+5_A=0.01_Msat=7.95e+5_u0Hke=NaN_DMI=NaN_J=4.0e+09_RT=100e-9_W=100e-9.mx3
 
 which is broken into a number of tokens, separated by single underscore characters.  Ordering of tokens does not matter.
 
