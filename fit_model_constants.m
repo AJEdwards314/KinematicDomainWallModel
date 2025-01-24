@@ -188,4 +188,8 @@ formatSpec = '%g %g %g %g %g %g \n';
 fprintf(fid,formatSpec,cat(2,param_list,interp_d2)');
 fclose(fid);
 
-
+fid = fopen(fullfile(myFolder, 'lookup_all.csv'),'w+');
+fprintf(fid,'Aex B_anis A Msat W c0 c1 c2 c3 drift_const d2 \n');
+formatSpec = '%g %g %g %g %g %g %g %g %g %g %g \n';
+fprintf(fid,formatSpec,cat(2,param_list,interp_maxVel_c0,interp_maxVel_c1,interp_maxVel_c2, interp_maxVel_c3,interp_drift_const,interp_d2)');
+fclose(fid);
