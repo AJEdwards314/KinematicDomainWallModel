@@ -1,0 +1,177 @@
+    
+`include "constants.vams"
+`include "disciplines.vams"
+
+// For model details, see  A. J. Edwards, K. Doleh, L. Humphrey, C. M. Linseisen, M. D. Kitcher,  
+// J. M. Martin, C. Cui, J. A. C. Incorvia, F. Garcia-Sanchez, N. Hassan, and J. S. Friedman, 
+// "Kinematic Model of Magnetic Domain Wall Motion for Fast, High-Accuracy Simulations"
+
+nature distance 
+    access = Metr;
+    units = "m";
+    abstol = 0.01n;
+	blowup = 1e12;
+endnature
+ 
+discipline Distance
+    potential distance;
+enddiscipline
+
+module DW_MTJ(L, R, M, X_OUT, V_OUT, A_OUT, R_M_OUT);
+
+inout L;       // Left terminal of DW_MTJ
+inout R;       // Right terminal of DW_MTJ
+inout M;       // Middle terminal of DW_MTJ
+output X_OUT;  // DW position (m)
+output V_OUT;  // DW velocity (m/s)
+output A_OUT;  // DW acceleration (m/s^2)
+output R_M_OUT; // r_m
+
+electrical L, R, M;
+electrical A; // Central node of Y junction
+Distance X_OUT;
+Distance V_OUT;
+Distance A_OUT;
+Distance R_M_OUT;
+
+// Domain Wall motion variables
+real x; // DW position (m)
+real v; // DW Velocity (m/s)
+real a; // DW Acceleration (m/s^2)
+
+// Resistance variables (see diagram)
+real R_L, R_R, r_m; 
+
+//
+//                                  M
+//                                  o
+//                                  |
+//                           o------|--------o
+//                          /       |       /|
+//                         o--------+------o |
+//         o---------------|    r_m Z      | o-----------------------o
+//        /                |        Z      |/                       /|
+//       o-----------------o========|======o-----------------------o |
+// L o- -|XXXXXXXXX/- - -/\/\/- - - o - - - - - -/\/\/- - - - - - -|- - -o R
+//       |XXXXXXXX/       R_L       A             R_R              |/
+//       o---------------------------------------------------------o
+//       |        |        |               |                       |
+//       v        v        v               v                       v
+//       0        x      MTJ_L           MTJ_R                    L_TR
+//
+//
+//  |                       |                                 Z
+//  v position (m)          o  - -o Electrical          /\/\/ Z resistors
+
+// Resistance parameters
+parameter real R_P  = 10k;        // parallel resistance when the DW is to the left of the MTJ
+parameter real R_AP = 30k;        // antiparallel resistance when the DW is to the right of the MTJ
+parameter real R_TR = 3.9k;       // R_TR = R_L + R_R.  R_L and R_R are proportionately calculated relative to the center of the MTJ
+
+// DW track length and MTJ position
+parameter real X_init = 0;        // Initial DW position (m)
+parameter real L_TR = 120e-9;     // Track length (m)
+parameter real MTJ_L = 20e-9;     // Location of left side of MTJ (m)
+parameter real MTJ_R = 100e-9;    // Location of right side of MTJ (m)
+
+// micromagnetic parameters
+parameter real Area = 60e-18;     // cross section area of heavy metal layer (m^2)
+
+parameter real C_R = 0.25;        // coefficient of restitution, controls track end bounce, between 0 and 1
+
+
+// Current density variables
+real Jdenss;
+real J_sign;
+real i_dw;
+
+// Simulation time for discrete dirivatives
+real prev_time; // Time of previous sample (s)
+real dt;        // Delta t (s)
+
+parameter real k0 = 8860119.243499318;       // Coefficient of  1 in quartic approx of a_J      (m/s^2)
+parameter real k1 = -0.09753798246948517;    // Coefficient of  J in quartic approx of a_J      (m/s^2 / (A/m^2))
+parameter real k2 = -4.822472584235295e-13;  // Coefficient of J2 in quartic approx of a_J      (m/s^2 / (A/m^2)^2) 
+parameter real k3 = 3.915841286728863e-23;   // Coefficient of J3 in quartic approx of a_J      (m/s^2 / (A/m^2)^3)
+parameter real k4 = -5.7783261239430415e-34; // Coefficient of J4 in quartic approx of a_J      (m/s^2 / (A/m^2)^4)
+parameter real d0 = 49154617.21376667;       // Coefficient of  1 in linear  approx of a_damp/v (m/s^2 / (m/s))
+parameter real d1 = 0.0013472790404595036;   // Coefficient of  J in linear  approx of a_damp/v (m/s^2 / (m/s) / (A/m^2))
+parameter real p0 = 4e9;                     // Pinning threshold relative to J                 (A/m^2)
+parameter real p1 = 0.25;                    // Pinning threshold relative to v                 (m/s)       
+
+real mu0 = 4*`M_PI*1e-7;
+
+analog begin
+    @(initial_step) begin
+        prev_time = $abstime;
+
+        R_R = (L_TR-(MTJ_R+MTJ_L)/2)/(L_TR)*R_TR;
+        R_L = R_TR - R_R;
+
+        x = X_init;
+        v = 0;
+    end
+
+    //if pos of DW below (left of) MTJ, stimulating current is measured between L and 
+    if(x < ((MTJ_L + MTJ_R)/2)) begin
+        i_dw = I(L, A);
+    end else begin
+        i_dw = I(A, R);
+    end
+    
+    //Conversion of current through heavy metal layer to current density
+    Jdenss = i_dw / Area;
+                          
+    // find sign of current density
+    if(Jdenss >0) begin
+        J_sign = 1;
+    end else if(Jdenss<0) begin
+        J_sign = -1;
+    end else begin
+        J_sign = 0;
+    end
+
+    dt = ($abstime - prev_time); //(s)
+
+    // Calculation of acceleration, velocity, position
+    if(abs(Jdenss) < p0 && abs(v) < p1) begin
+        a = -(10*d0)*v;  // Static friction
+    end else begin
+        a = J_sign*(k4*(abs(Jdenss)**4) + k3*(abs(Jdenss)**3) + k2*(abs(Jdenss)**2) + k1*abs(Jdenss) + k0) - (d0 + d1*abs(Jdenss))*v;    // [m/s^2]
+    end
+    v = v + a * dt; // Update velocity
+    x = x + v * dt; // Update position
+    
+    // Edge bounce
+
+    if(x<=0) begin
+        x = 0;
+        v = -C_R*v;
+    end else if(x>=L_TR) begin
+        x = L_TR;
+        v = -C_R*v;
+    end
+
+    if(x <= MTJ_L && x >=0) begin
+        r_m = R_P;
+    end else if(x >= MTJ_R && x <= L_TR) begin
+        r_m = R_AP;
+    end else begin 
+        r_m = ((MTJ_R - MTJ_L) * R_P * R_AP) / ((R_P * (x - MTJ_L)) + ( R_AP * (MTJ_R - x)));
+    end
+
+    // Instantiate resistors
+    I(L, A) <+ V(L, A) / R_L;
+    I(R, A) <+ V(R, A) / R_R;
+    I(A, M) <+ V(A, M) / r_m;
+
+    // Export DW position and MTJ resistance to electrical ports
+    Metr(X_OUT)   <+ x;
+	Metr(V_OUT)   <+ v;
+	Metr(A_OUT)   <+ a;
+    Metr(R_M_OUT) <+ r_m;
+
+    // Update time step
+    prev_time = $abstime;
+end
+endmodule
