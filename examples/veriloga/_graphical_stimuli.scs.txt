@@ -1,0 +1,4 @@
+_vP (P 0) vsource wave=[ 0 0 250n 0 250.1n Vin 251n Vin 251.1n 0 500n 0 500.1n Vin 501n Vin 501.1n 0 525n 0 525.1n Vin 526n Vin 526.1n 0 550n 0 550.1n Vin 551n Vin 551.1n 0 575n 0 575.1n Vin 576n Vin 576.1n 0 ] dc=1.8 type=pwl
+_vRA (RA 0) vsource dc=0 val0=0 val1=1.8 period=25n delay=12n rise=100p fall=100p width=1n type=pulse
+_vQ (Q 0) vsource wave=[ 0 0 10n 0 10.1n Vin 11n Vin 11.1n 0 100n 0 100.1n Vin 101n Vin 101.1n 0 150n 0 150.1n Vin 151n Vin 151.1n 0 300n 0 300.1n Vin 303n Vin 303.1n 0 ] dc=1.8 type=pwl
+_vRa_en (Ra_en 0) vsource dc=0 val0=1.8 val1=0 period=25n delay=12n rise=100p fall=100p width=1n type=pulse
