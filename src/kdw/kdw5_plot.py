@@ -101,7 +101,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Aggregate error accross different parameter values and plot.")
     parser.add_argument("home_folder", type=str, help="The master directory")  # Positional argument
     parser.add_argument("--error_folder", type=str, default='', help="Folder where error tables are stored.")  # Optional argument
-    parser.add_argument("--aggregate_error_folder", type=str, default='', nargs='+', help="Folder where to save aggregate error plots.") #Optional argument
+    parser.add_argument("--aggregate_error_folder", type=str, default='', help="Folder where to save aggregate error plots.") #Optional argument
 
     args = parser.parse_args()
 
