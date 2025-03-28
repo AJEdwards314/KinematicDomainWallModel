@@ -37,7 +37,7 @@ hcut := 1.0546e-34
 thetaSH := 0.05
 e := 1.6e-19
 Ms:= 1.5/(pi*4e-7)
-mull:=2
+mull:=0.1
 fixedlayer.setregion(0, vector(0,1,0) )
 
 
@@ -64,14 +64,14 @@ tableautosave(1e-11)
 
 // simulate simple constant current pulse
 
-Jelec:= 4.0e+09
-j.setregion(0, vector(0, 0,Jelec))
+Jelec:= 8.0e+10
+j.setregion(0, vector(0, 0,thetaSH*Jelec))
 B_ext.setregion(0, vector(0,mull*hcut*thetaSH*Jelec/(2*e*Ms*sizeZ),0))
 
 run(100e-9)
 
 Jelec = 0
-j.setregion(0, vector(0, 0,Jelec))
+j.setregion(0, vector(0, 0,thetaSH*Jelec))
 B_ext.setregion(0, vector(0, mull*hcut*thetaSH*Jelec/(2*e*Ms*sizeZ),0))
 
 run(100e-9)

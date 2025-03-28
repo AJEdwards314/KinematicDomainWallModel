@@ -36,7 +36,7 @@ def plot(home_folder, error_folder = '', aggregate_error_folder = ''):
     plot_error_by_J(df, aggregate_error_folder, 'errors_Msat_795e3.png', [{'Msat':7.95e5}])
     plot_error_by_J(df, aggregate_error_folder, 'errors_Aex_11e-12.png', [{'Aex':11e-12}])
     plot_error_by_J(df, aggregate_error_folder, 'errors_Aex_31e-12.png', [{'Aex':31e-12}])
-    plot_error_by_J(df, aggregate_error_folder, 'errors_indiv.png', [{'Aex':31e-12, 'Ku': 1.11e6, 'A':0.05, 'W':100e-9}])
+    plot_error_by_J(df, aggregate_error_folder, 'errors_indiv.png', [{'Aex':11e-12, 'Ku': 4.05e5, 'A':0.01, 'W':100e-9, 'Msat': 7.95e5}])
             
             
 def plot_error_by_J(df, aggregate_error_folder, img_name, column_vals = []):
@@ -69,10 +69,10 @@ def plot_error_by_J(df, aggregate_error_folder, img_name, column_vals = []):
     #set color to red
 
     # change line thickness of plot
-    plt.errorbar(df_avg['J']/1e9-0.75, df_avg['rmse_J_on' ]*100, yerr=np.vstack([df_lower_quartile['rmse_J_on' ], df_upper_quartile['rmse_J_on' ]])*100, marker='s', markersize=3, color='blue' , linewidth=1.25, capsize=2.5, elinewidth=0.5)
-    plt.errorbar(df_avg['J']/1e9-0.25, df_avg['err_maxvel']*100, yerr=np.vstack([df_lower_quartile['err_maxvel'], df_upper_quartile['err_maxvel']])*100, marker='s', markersize=3, color='red'  , linewidth=1.25, capsize=2.5, elinewidth=0.5)
-    plt.errorbar(df_avg['J']/1e9+0.25, df_avg['rmse_J_off']*100, yerr=np.vstack([df_lower_quartile['rmse_J_off'], df_upper_quartile['rmse_J_off']])*100, marker='s', markersize=3, color='green', linewidth=1.25, capsize=2.5, elinewidth=0.5)
-    plt.errorbar(df_avg['J']/1e9+0.75, df_avg['err_pos'   ]*100, yerr=np.vstack([df_lower_quartile['err_pos'   ], df_upper_quartile['err_pos'   ]])*100, marker='s', markersize=3, color='black', linewidth=1.25, capsize=2.5, elinewidth=0.5)
+    plt.errorbar(df_avg['J']/1e9-15, df_avg['rmse_J_on' ]*100, yerr=np.vstack([df_lower_quartile['rmse_J_on' ], df_upper_quartile['rmse_J_on' ]])*100, marker='s', markersize=3, color='blue' , linewidth=1.25, capsize=2.5, elinewidth=0.5)
+    plt.errorbar(df_avg['J']/1e9-5, df_avg['err_maxvel']*100, yerr=np.vstack([df_lower_quartile['err_maxvel'], df_upper_quartile['err_maxvel']])*100, marker='s', markersize=3, color='red'  , linewidth=1.25, capsize=2.5, elinewidth=0.5)
+    plt.errorbar(df_avg['J']/1e9+5, df_avg['rmse_J_off']*100, yerr=np.vstack([df_lower_quartile['rmse_J_off'], df_upper_quartile['rmse_J_off']])*100, marker='s', markersize=3, color='green', linewidth=1.25, capsize=2.5, elinewidth=0.5)
+    plt.errorbar(df_avg['J']/1e9+15, df_avg['err_pos'   ]*100, yerr=np.vstack([df_lower_quartile['err_pos'   ], df_upper_quartile['err_pos'   ]])*100, marker='s', markersize=3, color='black', linewidth=1.25, capsize=2.5, elinewidth=0.5)
     plt.ylabel('Error (%)')
     #move ylabel to the right
     plt.gca().yaxis.set_label_coords(-0.11,0.5)
@@ -80,11 +80,11 @@ def plot_error_by_J(df, aggregate_error_folder, img_name, column_vals = []):
     plt.gca().xaxis.set_label_coords(0.5,-0.07)    
     
     plt.ylim(0, 10)
-    plt.xlim(0, 44)
+    plt.xlim(0, 880)
     plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: '{:.0f}%'.format(x)))
     plt.gca().set_yticks(np.arange(0, 11, 2))
     plt.gca().set_yticks(np.arange(0, 11, 1), minor=True)
-    plt.gca().set_xticks(np.arange(4, 44, 4))
+    plt.gca().set_xticks(np.arange(160, 880, 160))
     plt.grid()
     plt.gca().tick_params(which='both', direction='in')
     plt.gca().tick_params(which='both', top=True, right=True)
