@@ -89,14 +89,14 @@ real i_dw;
 real prev_time; // Time of previous sample (s)
 real dt;        // Delta t (s)
 
-parameter real k0 = 8860119.243499318;       // Coefficient of  1 in quartic approx of a_J      (m/s^2)
-parameter real k1 = -0.09753798246948517;    // Coefficient of  J in quartic approx of a_J      (m/s^2 / (A/m^2))
-parameter real k2 = -4.822472584235295e-13;  // Coefficient of J2 in quartic approx of a_J      (m/s^2 / (A/m^2)^2) 
-parameter real k3 = 3.915841286728863e-23;   // Coefficient of J3 in quartic approx of a_J      (m/s^2 / (A/m^2)^3)
-parameter real k4 = -5.7783261239430415e-34; // Coefficient of J4 in quartic approx of a_J      (m/s^2 / (A/m^2)^4)
-parameter real d0 = 49154617.21376667;       // Coefficient of  1 in linear  approx of a_damp/v (m/s^2 / (m/s))
-parameter real d1 = 0.0013472790404595036;   // Coefficient of  J in linear  approx of a_damp/v (m/s^2 / (m/s) / (A/m^2))
-parameter real p0 = 4e9;                     // Pinning threshold relative to J                 (A/m^2)
+parameter real k0 = 8860118.3062847;         // Coefficient of  1 in quartic approx of a_J      (m/s^2)
+parameter real k1 = -0.00487689910818454;    // Coefficient of  J in quartic approx of a_J      (m/s^2 / (A/m^2))
+parameter real k2 = -1.2056181829813014e-15; // Coefficient of J2 in quartic approx of a_J      (m/s^2 / (A/m^2)^2) 
+parameter real k3 = 4.894801586150407e-27;   // Coefficient of J3 in quartic approx of a_J      (m/s^2 / (A/m^2)^3)
+parameter real k4 = -3.611453763100189e-39;  // Coefficient of J4 in quartic approx of a_J      (m/s^2 / (A/m^2)^4)
+parameter real d0 = 49154617.19999064;       // Coefficient of  1 in linear  approx of a_damp/v (m/s^2 / (m/s))
+parameter real d1 = 6.736395204757528e-05;   // Coefficient of  J in linear  approx of a_damp/v (m/s^2 / (m/s) / (A/m^2))
+parameter real p0 = 80e9;                    // Pinning threshold relative to J                 (A/m^2)
 parameter real p1 = 0.25;                    // Pinning threshold relative to v                 (m/s)       
 
 real mu0 = 4*`M_PI*1e-7;
