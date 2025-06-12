@@ -112,7 +112,7 @@ analog begin
         v = 0;
     end
 
-    //if pos of DW below (left of) MTJ, stimulating current is measured between L and 
+    //if pos of DW below (left of) MTJ, stimulating current is measured between L and A
     if(x < ((MTJ_L + MTJ_R)/2)) begin
         i_dw = I(L, A);
     end else begin
